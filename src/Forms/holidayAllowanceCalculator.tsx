@@ -26,12 +26,12 @@ export const AllowanceForm = (): JSX.Element => {
   const [holidayCarryOver, setHolidayCarryOver] = useState<
     number | undefined
   >();
-  const [holidayTaken, setHolidayTaken] = useState<number>(0);
-  const [totHolidays, setTotHolidays] = useState<number>(0);
-  const [totAnnAllowance, setTotAnnAllowance] = useState<number>(0);
-  const [totCarryOver, setTotCarryOver] = useState<number>(0);
-  const [totAccrued, setTotAccrued] = useState<number>(0);
-  const [totPayout, setTotPayout] = useState<number | string>(0);
+  const [holidayTaken, setHolidayTaken] = useState<number | undefined>();
+  const [totHolidays, setTotHolidays] = useState<number | undefined>(0);
+  const [totAnnAllowance, setTotAnnAllowance] = useState<number>();
+  const [totCarryOver, setTotCarryOver] = useState<number | undefined>();
+  const [totAccrued, setTotAccrued] = useState<number | undefined>();
+  const [totPayout, setTotPayout] = useState<number | string>();
   const [isComplete, setIsComplete] = useState<boolean>(false);
 
   useEffect(() => {
@@ -215,7 +215,7 @@ export const AllowanceForm = (): JSX.Element => {
           Carry Overs) *
           <input
             type="number"
-            step="step"
+            step="any"
             min="0"
             value={annualHolidaysAllowance}
             onChange={(e) =>
@@ -267,7 +267,7 @@ export const AllowanceForm = (): JSX.Element => {
           <input
             type="number"
             min="0"
-            step="step"
+            step="any"
             value={holidayCarryOver}
             onChange={(e) =>
               parseFloat(e.target.value) < 0
@@ -287,7 +287,7 @@ export const AllowanceForm = (): JSX.Element => {
             type="number"
             min="0"
             value={holidayTaken}
-            step="0.01"
+            step="any"
             onChange={(e) =>
               parseFloat(e.target.value) < 0
                 ? setHolidayTaken(0)
@@ -361,7 +361,9 @@ export const AllowanceForm = (): JSX.Element => {
                 setTotAnnAllowance(
                   calculateAnnualHolidaysAllowance(daysWorkedPerWeek)
                 );
-                setTotCarryOver(calculateAnnualCarryOver(totAnnAllowance, 8));
+                setTotCarryOver(
+                  calculateAnnualCarryOver(totAnnAllowance as number, 8)
+                );
                 const totAccruedRes = calculateAccruedHolidays(
                   contractHolidayStartPer,
                   ed,
@@ -397,7 +399,12 @@ export const AllowanceForm = (): JSX.Element => {
           }}
         >
           <p>Total Holidays Taken: {totHolidays}</p>
-          <p>Accrued Holidays Remaining: {parseFloat(totAccrued.toFixed(5))}</p>
+          <p>
+            Accrued Holidays Remaining:{" "}
+            {totAccrued === undefined
+              ? null
+              : parseFloat((totAccrued as number).toFixed(5))}
+          </p>
           <p>Employee Payout: {totPayout} </p>
         </div>
       </div>
