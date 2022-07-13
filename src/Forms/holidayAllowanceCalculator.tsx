@@ -55,7 +55,7 @@ export const AllowanceForm = (): JSX.Element => {
       }}
     >
       <div className="flex-container">
-        <h2>Employee Details</h2>
+        <h2>Employement Details</h2>
       </div>
       <p>
         <label>
@@ -319,6 +319,7 @@ export const AllowanceForm = (): JSX.Element => {
                 const sdSplit = startDate.split("-").map((el) => parseInt(el));
                 const sd = new Date(sdSplit[0], sdSplit[1], sdSplit[2]);
                 const edSplit = endDate.split("-").map((el) => parseInt(el));
+
                 const ed = new Date(edSplit[0], edSplit[1], edSplit[2]);
 
                 const contractHolidayStartPeriodSplit = startPeriodSpecified
@@ -329,15 +330,15 @@ export const AllowanceForm = (): JSX.Element => {
 
                 const contractHolidayStartPer = contractHolidayStartPeriodSplit
                   ? new Date(
-                      contractHolidayStartPeriodSplit[2],
+                      contractHolidayStartPeriodSplit[0],
                       contractHolidayStartPeriodSplit[1],
-                      contractHolidayStartPeriodSplit[0]
+                      contractHolidayStartPeriodSplit[2]
                     )
                   : sd;
-                //console.log(contractHolidayStartPer);
+
                 if (ed.getTime() - sd.getTime() < 0) {
                   alert(
-                    "Termination date cannot be before beginning of employment"
+                    "Termination date cannot be before start of employment"
                   );
                   return;
                 } else if (
@@ -371,7 +372,7 @@ export const AllowanceForm = (): JSX.Element => {
                   holidayCarryOver
                 );
                 setTotAccrued(totAccruedRes);
-                console.log("pay");
+
                 setTotPayout(
                   calculatePayout(
                     salary,
@@ -380,7 +381,7 @@ export const AllowanceForm = (): JSX.Element => {
                     totAccruedRes
                   )
                 );
-                console.log(totPayout);
+
                 setIsComplete(true);
               }
             }}
@@ -432,7 +433,7 @@ const calculateDaysBetweenDateYD = (start: Date, end: Date): number => {
   let mil = calculateDateDiffMil(start, end);
   const oneYearMill = 1000 * 3600 * 24 * 365;
   while (mil > oneYearMill) mil -= oneYearMill;
-  console.log();
+
   return mil / (3600 * 1000 * 24);
 };
 const calculateDateDiffMil = (start: Date, end: Date): number => {
