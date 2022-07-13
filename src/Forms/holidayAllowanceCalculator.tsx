@@ -59,7 +59,7 @@ export const AllowanceForm = (): JSX.Element => {
       </div>
       <p>
         <label>
-          Employment start date *{" "}
+          Employment Start Date *{" "}
           <input
             type="date"
             value={startDate}
@@ -70,7 +70,7 @@ export const AllowanceForm = (): JSX.Element => {
       </p>
       <p>
         <label>
-          Employment termination date *
+          Employment Termination Date *
           <input
             type="date"
             value={endDate}
@@ -119,7 +119,7 @@ export const AllowanceForm = (): JSX.Element => {
       </p>
       <p>
         <label>
-          Days worked per week *
+          Days Worked per Week *
           <input
             type="number"
             min="0"
@@ -134,7 +134,7 @@ export const AllowanceForm = (): JSX.Element => {
           />
         </label>
       </p>
-      <legend>Holiday period start date specified in contract *</legend>
+      <legend>Holiday Period Start Date Specified in Contract *</legend>
       <p>
         <label className="choice">
           {" "}
@@ -169,7 +169,7 @@ export const AllowanceForm = (): JSX.Element => {
       </p>
       <p>
         <label>
-          Current holiday period start date (leave blank if not in contract)
+          Current Holiday Period Start Date (leave blank if not in contract)
           <input
             type="date"
             value={currentHolidayPeriodStartDate}
@@ -197,21 +197,21 @@ export const AllowanceForm = (): JSX.Element => {
       <p>
         <label>
           {" "}
-          Employee's annual holiday allowance (inclusive of bank holidays)
+          Employee's Annual Holiday Allowance (inclusive of bank holidays)
           <input readOnly type="number" value={totAnnAllowance} />
         </label>
       </p>
       <p>
         <label>
           {" "}
-          Employee's annual carry over allowance
+          Employee's Annual Carry Over Allowance
           <input readOnly type="number" value={totCarryOver} />
         </label>
       </p>
       <h2>Employee Holiday Balance (Termination Year)</h2>
       <p>
         <label>
-          Input employee's annual holiday allowance for current cycle (Excluding
+          Input Employee's Annual Holiday Allowance for Current Cycle (Excluding
           Carry Overs) *
           <input
             type="number"
@@ -228,7 +228,7 @@ export const AllowanceForm = (): JSX.Element => {
           />
         </label>
       </p>
-      <legend>Does allowance include Bank Holidays ? *</legend>
+      <legend>Does Allowance Include Bank Holidays ? *</legend>
       <p>
         <label className="choice">
           {" "}
@@ -263,7 +263,7 @@ export const AllowanceForm = (): JSX.Element => {
       </p>
       <p>
         <label>
-          Input employee's holidays carried over from previous cycle *
+          Employee's Holidays Carried Over From Previous Cycle *
           <input
             type="number"
             min="0"
@@ -281,8 +281,8 @@ export const AllowanceForm = (): JSX.Element => {
       </p>
       <p>
         <label>
-          Input employee's holidays taken in current cycle (up to the
-          termination date and excluding bank holidays) *
+          Employee's Holidays Taken in Current Cycle (up to the termination date
+          and excluding bank holidays) *
           <input
             type="number"
             min="0"
@@ -397,7 +397,7 @@ export const AllowanceForm = (): JSX.Element => {
           }}
         >
           <p>Total Holidays Taken: {totHolidays}</p>
-          <p>Accrued holidays remaining: {parseFloat(totAccrued.toFixed(5))}</p>
+          <p>Accrued Holidays Remaining: {parseFloat(totAccrued.toFixed(5))}</p>
           <p>Employee Payout: {totPayout} </p>
         </div>
       </div>
