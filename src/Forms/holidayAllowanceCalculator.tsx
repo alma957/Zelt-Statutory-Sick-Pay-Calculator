@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { NoSubstitutionTemplateLiteral } from "typescript";
 
 import {
   englandBkHol,
@@ -55,7 +56,7 @@ export const AllowanceForm = (): JSX.Element => {
       }}
     >
       <div className="flex-container">
-        <h2>Employement Details</h2>
+        <h2>Employment Details</h2>
       </div>
       <p>
         <label>
@@ -193,21 +194,6 @@ export const AllowanceForm = (): JSX.Element => {
           </select>
         </label>
       </p>
-      <h2>Annual Statuatory Allowance (Automatically Calculated)</h2>
-      <p>
-        <label>
-          {" "}
-          Employee's Annual Holiday Allowance (inclusive of bank holidays)
-          <input readOnly type="number" value={totAnnAllowance} />
-        </label>
-      </p>
-      <p>
-        <label>
-          {" "}
-          Employee's Annual Carry Over Allowance
-          <input readOnly type="number" value={totCarryOver} />
-        </label>
-      </p>
       <h2>Employee Holiday Balance (Termination Year)</h2>
       <p>
         <label>
@@ -328,14 +314,20 @@ export const AllowanceForm = (): JSX.Element => {
                       .map((el) => parseInt(el))
                   : null;
 
-                const contractHolidayStartPer = contractHolidayStartPeriodSplit
-                  ? new Date(
-                      contractHolidayStartPeriodSplit[0],
-                      contractHolidayStartPeriodSplit[1],
-                      contractHolidayStartPeriodSplit[2]
-                    )
-                  : sd;
-
+                const contractHolidayStartPerCheck =
+                  contractHolidayStartPeriodSplit
+                    ? new Date(
+                        contractHolidayStartPeriodSplit[0],
+                        contractHolidayStartPeriodSplit[1],
+                        contractHolidayStartPeriodSplit[2]
+                      )
+                    : sd;
+                const contractHolidayStartPer = new Date(
+                  Math.max(
+                    contractHolidayStartPerCheck.getTime() as number,
+                    sd.getTime() as number
+                  )
+                );
                 if (ed.getTime() - sd.getTime() < 0) {
                   alert(
                     "Termination date cannot be before start of employment"
@@ -425,21 +417,52 @@ const calculateTotalHolidays = (
       : calculateNumberOfBankHolidays(startDate, endDate, jurisdiction))
   );
 };
-const calculateAnnualHolidaysAllowance = (
+export const calculateAnnualHolidaysAllowance = (
   daysWorkedPerWeek: number
 ): number => {
-  return Math.min(28, 5.6 * daysWorkedPerWeek);
+  return roundUpAll(Math.min(28, 5.6 * daysWorkedPerWeek), 1);
 };
-const calculateAnnualCarryOver = (
+export const calculateAnnualCarryOver = (
   allowance: number,
   maxCarry: number
 ): number => {
-  return Math.min(maxCarry, (1.6 / 5.6) * allowance);
+  return roundUpAll(Math.min(maxCarry, (1.6 / 5.6) * allowance), 1);
 };
-const calculateDaysBetweenDateYD = (start: Date, end: Date): number => {
+export const leap = (start: Date, end: Date): number => {
   let mil = calculateDateDiffMil(start, end);
   const oneYearMill = 1000 * 3600 * 24 * 365;
   while (mil > oneYearMill) mil -= oneYearMill;
+
+  const startMil = end.getTime() - mil;
+  const startYear = new Date(startMil).getFullYear();
+  let endYear = new Date(end).getFullYear();
+
+  if (startYear == endYear) endYear++;
+
+  const startYearLeap = leapYear(startYear);
+  const endYearLeap = leapYear(endYear);
+  let l: any = undefined;
+  if (startYearLeap) {
+    l = new Date(startYear, 1, 29).getTime();
+  } else if (endYearLeap) {
+    l = new Date(endYear, 1, 29).getTime();
+  }
+  if (l === undefined) return 0;
+  if (l > startMil && l < startMil + 3600 * 1000 * 24 * 366) return 1;
+  return 0;
+};
+const leapYear = (year: number) => {
+  if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+    return true;
+  }
+
+  return false;
+};
+const calculateDaysBetweenDateYD = (start: Date, end: Date): number => {
+  let mil = calculateDateDiffMil(start, end);
+  const oneYearMill = 1000 * 3600 * 24 * (365 + leap(start, end));
+  while (mil + leap(start, end) * 3600 * 24 * 1000 > oneYearMill)
+    mil -= oneYearMill;
 
   return mil / (3600 * 1000 * 24);
 };
@@ -457,7 +480,11 @@ const calculateAccruedHolidays = (
   jurisdiction: string,
   carryOver: number
 ): number => {
-  const daysWorkedToDate = calculateDaysBetweenDateYD(startDate, endDate);
+  const daysWorkedToDate =
+    calculateDaysBetweenDateYD(startDate, endDate) +
+    1 +
+    leap(startDate, endDate);
+  console.log("hello", daysWorkedToDate);
   const nBankHolidays = calculateNumberOfBankHolidays(
     startDate,
     endDate,
@@ -465,7 +492,12 @@ const calculateAccruedHolidays = (
   );
 
   return (
-    roundUp((daysWorkedToDate / 365) * annualHolidayAllowance + carryOver, 1) -
+    roundUpAll(
+      (daysWorkedToDate / (365 + leap(startDate, endDate))) *
+        annualHolidayAllowance +
+        carryOver,
+      1
+    ) -
     holidayTaken +
     (bankHolidaysIncluded ? 0 : nBankHolidays)
   );
@@ -479,8 +511,9 @@ const calculateNumberOfBankHolidays = (
   mil?: number
 ): number => {
   let diff = mil ? mil : calculateDateDiffMil(startDate, endDate);
-  const oneYearMill = 1000 * 3600 * 24 * 365;
-  while (diff > oneYearMill) diff -= oneYearMill;
+  const oneYearMill = 1000 * 3600 * 24 * (365 + leap(startDate, endDate));
+  while (diff + leap(startDate, endDate) * 3600 * 24 * 1000 > oneYearMill)
+    diff -= oneYearMill;
   const periodStartDateMill = new Date(startDate.getDate() + diff).getTime();
   const periodEndDateMill = endDate.getTime();
 
@@ -517,8 +550,22 @@ const calculatePayout = (
     : "£" + currencyFormat(pay);
 };
 
-const roundUp = (num: number, precision: number): number => {
-  return Math.ceil(num * Math.pow(10, precision)) / Math.pow(10, precision);
+export const roundUpAll = (original: number, precision: number) => {
+  var multiplier = Math.pow(10, precision || 0);
+  const value = parseFloat(original.toFixed(2));
+  const digits =
+    String(value).split(".").length > 0 ? String(value).split(".")[1] : [];
+  const numberOfDig = digits?.length ? digits.length : 0;
+
+  const add =
+    numberOfDig === 0
+      ? 0
+      : Math.pow(10, -digits.length + 1) -
+        Math.pow(10, -numberOfDig) * parseInt(digits[digits.length - 1]);
+
+  let rounded = Math.round((value + add) * multiplier) / multiplier;
+
+  return rounded;
 };
 
 const currencyFormat = (num: number): string => {
