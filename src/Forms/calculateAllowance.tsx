@@ -149,7 +149,7 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                       .split("-")
                       .map((el) => parseInt(el))
                   : null;
-                console.log(contractHolidayStartPeriodSplit);
+
                 const contractHolidayStartPerCheck =
                   contractHolidayStartPeriodSplit
                     ? new Date(
@@ -164,6 +164,7 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                     sd.getTime() as number
                   )
                 ).getTime();
+
                 if (ed - sd.getTime() < 0) {
                   alert(
                     "Termination date cannot be before start of employment"
@@ -175,18 +176,13 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                   );
                   return;
                 }
+
                 const dayMill = 1000 * 24 * 3600;
+
                 const annMill =
                   dayMill * +(365 + leap(contractHolidayStartPer));
                 let diff = ed - contractHolidayStartPer + dayMill;
-                console.log(
-                  "diff, ",
-                  diff,
-                  " leap: ",
-                  leap(contractHolidayStartPer),
-                  " ann mill ",
-                  annMill
-                );
+
                 while (diff > dayMill * (365 + leap(contractHolidayStartPer))) {
                   contractHolidayStartPer +=
                     dayMill * (365 + leap(contractHolidayStartPer));
@@ -202,7 +198,7 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                 setTotCarryOver(totCarry);
 
                 while (diff > annMill) diff -= annMill;
-                console.log("h");
+
                 const prop =
                   Math.ceil(diff / (3600 * 1000 * 24)) /
                   (365 + 1 + leap(contractHolidayStartPer));
