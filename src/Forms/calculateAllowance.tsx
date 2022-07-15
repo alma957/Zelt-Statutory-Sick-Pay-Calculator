@@ -107,7 +107,7 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
         Days Worked per Week *
         <input
           type="number"
-          min="0"
+          min="0.1"
           step="any"
           value={daysWorkedPerWeek}
           required
