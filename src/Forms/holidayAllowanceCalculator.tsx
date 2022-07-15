@@ -54,7 +54,7 @@ export const calculateDateDiffMil = (start: Date, end: Date): number => {
 };
 
 export const roundUpAll = (original: number, precision: number) => {
-  const value = original.toFixed(2);
+  const value = original.toFixed(10);
 
   const digits = value.split(".")[1];
   let rounded: number | undefined = undefined;
