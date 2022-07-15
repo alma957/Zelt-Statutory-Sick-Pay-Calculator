@@ -1,6 +1,4 @@
-import { val } from "cheerio/lib/api/attributes";
-import { table } from "console";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {
   calculateAnnualCarryOver,
@@ -8,7 +6,7 @@ import {
   roundUpAll,
   leap,
 } from "./holidayAllowanceCalculator";
-import {} from "./variables";
+
 export const StatuatoryAllowanceCalc = (): JSX.Element => {
   const defDate = new Date(new Date().getFullYear(), 0, 1)
     .toISOString()
@@ -113,11 +111,9 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
           step="any"
           value={daysWorkedPerWeek}
           required
-          onChange={(e) =>
-            parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 7
-              ? ""
-              : setDaysWorkedPerWeek(parseFloat(e.target.value))
-          }
+          onChange={(e) => {
+            setDaysWorkedPerWeek(parseFloat(e.target.value));
+          }}
         />
       </label>
       <div className="flex-container">
@@ -133,13 +129,18 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                 !/[a-zA-Z]/.test(endDate)
               ) {
                 const sdSplit = startDate.split("-").map((el) => parseInt(el));
-                const sd = new Date(sdSplit[0], sdSplit[1], sdSplit[2]);
+                const sd = new Date(sdSplit[0], sdSplit[1] - 1, sdSplit[2]);
                 const edSplit = endDate.split("-").map((el) => parseInt(el));
 
-                const ed = new Date(edSplit[0], edSplit[1], edSplit[2]);
+                const ed = new Date(
+                  edSplit[0],
+                  edSplit[1] - 1,
+                  edSplit[2]
+                ).getTime();
+
                 if (
                   startPeriodSpecified &&
-                  !/[a-zA-Z]/.test(currentHolidayPeriodStartDate!)
+                  /[a-zA-Z]/.test(currentHolidayPeriodStartDate!)
                 )
                   return;
 
@@ -148,53 +149,64 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
                       .split("-")
                       .map((el) => parseInt(el))
                   : null;
-
+                console.log(contractHolidayStartPeriodSplit);
                 const contractHolidayStartPerCheck =
                   contractHolidayStartPeriodSplit
                     ? new Date(
                         contractHolidayStartPeriodSplit[0],
-                        contractHolidayStartPeriodSplit[1],
+                        contractHolidayStartPeriodSplit[1] - 1,
                         contractHolidayStartPeriodSplit[2]
                       )
                     : sd;
-                const contractHolidayStartPer = new Date(
+                let contractHolidayStartPer = new Date(
                   Math.max(
                     contractHolidayStartPerCheck.getTime() as number,
                     sd.getTime() as number
                   )
-                );
-                if (ed.getTime() - sd.getTime() < 0) {
+                ).getTime();
+                if (ed - sd.getTime() < 0) {
                   alert(
                     "Termination date cannot be before start of employment"
                   );
                   return;
-                } else if (
-                  ed.getTime() - contractHolidayStartPer.getTime() <
-                  0
-                ) {
+                } else if (ed - contractHolidayStartPer < 0) {
                   alert(
                     "Termination date cannot be before current holiday period start date"
                   );
                   return;
                 }
+                const dayMill = 1000 * 24 * 3600;
+                const annMill =
+                  dayMill * +(365 + leap(contractHolidayStartPer));
+                let diff = ed - contractHolidayStartPer + dayMill;
+                console.log(
+                  "diff, ",
+                  diff,
+                  " leap: ",
+                  leap(contractHolidayStartPer),
+                  " ann mill ",
+                  annMill
+                );
+                while (diff > dayMill * (365 + leap(contractHolidayStartPer))) {
+                  contractHolidayStartPer +=
+                    dayMill * (365 + leap(contractHolidayStartPer));
+                  diff -= dayMill * (365 + leap(contractHolidayStartPer));
+                }
+
                 const tAnAll =
                   calculateAnnualHolidaysAllowance(daysWorkedPerWeek);
 
                 setTotAnnAllowance(tAnAll);
+
                 const totCarry = calculateAnnualCarryOver(tAnAll as number, 8);
                 setTotCarryOver(totCarry);
-                const dayMill = 3600 * 1000 * 24;
-                let diff = ed.getTime() - contractHolidayStartPer.getTime();
-
-                const annMill =
-                  1000 * 3600 * 24 * (365 + leap(contractHolidayStartPer, ed));
 
                 while (diff > annMill) diff -= annMill;
-
+                console.log("h");
                 const prop =
-                  Math.ceil((diff + dayMill) / (3600 * 1000 * 24)) /
-                  (365 + leap(contractHolidayStartPer, ed));
-                console.log(leap(contractHolidayStartPer, ed));
+                  Math.ceil(diff / (3600 * 1000 * 24)) /
+                  (365 + 1 + leap(contractHolidayStartPer));
+
                 setRatAnnAllowance(roundUpAll((tAnAll as number) * prop, 1));
                 setRatCarryOver(roundUpAll((totCarry as number) * prop, 1));
                 setIsComplete(true);
@@ -226,11 +238,4 @@ export const StatuatoryAllowanceCalc = (): JSX.Element => {
       </div>
     </form>
   );
-};
-const nearestMid = (value: number): number => {
-  const rounded = Math.round(value);
-  if (rounded === Math.floor(value))
-    return Math.ceil(value) / 2 + Math.floor(value) / 2;
-
-  return Math.ceil(value);
 };

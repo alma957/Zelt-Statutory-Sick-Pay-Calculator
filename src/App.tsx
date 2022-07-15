@@ -4,7 +4,7 @@ import { StatuatoryAllowanceCalc } from "./Forms/calculateAllowance";
 function App() {
   return (
     <div className="App">
-      <AllowanceForm />
+      <StatuatoryAllowanceCalc />
     </div>
   );
 }

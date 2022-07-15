@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { NoSubstitutionTemplateLiteral } from "typescript";
+import { val } from "cheerio/lib/api/attributes";
+import { useEffect, useState } from "react";
 
 import {
   englandBkHol,
@@ -35,17 +35,17 @@ export const AllowanceForm = (): JSX.Element => {
   const [totPayout, setTotPayout] = useState<number | string>();
   const [isComplete, setIsComplete] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (daysWorkedPerWeek !== undefined)
-      setTotAnnAllowance(calculateAnnualHolidaysAllowance(daysWorkedPerWeek));
+  // useEffect(() => {
+  //   if (daysWorkedPerWeek !== undefined)
+  //     setTotAnnAllowance(calculateAnnualHolidaysAllowance(daysWorkedPerWeek));
 
-    if (daysWorkedPerWeek !== undefined)
-      setTotAnnAllowance(calculateAnnualHolidaysAllowance(daysWorkedPerWeek));
-    if (totAnnAllowance) {
-      const carryOver = calculateAnnualCarryOver(totAnnAllowance, 8);
-      setTotCarryOver(carryOver);
-    }
-  }, [daysWorkedPerWeek, totAnnAllowance]);
+  //   if (daysWorkedPerWeek !== undefined)
+  //     setTotAnnAllowance(calculateAnnualHolidaysAllowance(daysWorkedPerWeek));
+  //   if (totAnnAllowance) {
+  //     const carryOver = calculateAnnualCarryOver(totAnnAllowance, 8);
+  //     setTotCarryOver(carryOver);
+  //   }
+  // }, [daysWorkedPerWeek, totAnnAllowance]);
 
   return (
     <form
@@ -123,15 +123,12 @@ export const AllowanceForm = (): JSX.Element => {
           Days Worked per Week *
           <input
             type="number"
-            min="0"
+            min="1"
+            max="7"
             step="any"
             value={daysWorkedPerWeek}
             required
-            onChange={(e) =>
-              parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 7
-                ? ""
-                : setDaysWorkedPerWeek(parseFloat(e.target.value))
-            }
+            onChange={(e) => setDaysWorkedPerWeek(parseFloat(e.target.value))}
           />
         </label>
       </p>
@@ -306,7 +303,11 @@ export const AllowanceForm = (): JSX.Element => {
                 const sd = new Date(sdSplit[0], sdSplit[1], sdSplit[2]);
                 const edSplit = endDate.split("-").map((el) => parseInt(el));
 
-                const ed = new Date(edSplit[0], edSplit[1], edSplit[2]);
+                const ed = new Date(
+                  edSplit[0],
+                  edSplit[1] - 1,
+                  edSplit[2]
+                ).getTime();
 
                 const contractHolidayStartPeriodSplit = startPeriodSpecified
                   ? currentHolidayPeriodStartDate
@@ -318,29 +319,35 @@ export const AllowanceForm = (): JSX.Element => {
                   contractHolidayStartPeriodSplit
                     ? new Date(
                         contractHolidayStartPeriodSplit[0],
-                        contractHolidayStartPeriodSplit[1],
+                        contractHolidayStartPeriodSplit[1] - 1,
                         contractHolidayStartPeriodSplit[2]
                       )
                     : sd;
-                const contractHolidayStartPer = new Date(
+                let contractHolidayStartPer = new Date(
                   Math.max(
                     contractHolidayStartPerCheck.getTime() as number,
                     sd.getTime() as number
                   )
-                );
-                if (ed.getTime() - sd.getTime() < 0) {
+                ).getTime();
+                if (ed - sd.getTime() < 0) {
                   alert(
                     "Termination date cannot be before start of employment"
                   );
                   return;
-                } else if (
-                  ed.getTime() - contractHolidayStartPer.getTime() <
-                  0
-                ) {
+                } else if (ed - contractHolidayStartPer < 0) {
                   alert(
                     "Termination date cannot be before current holiday period start date"
                   );
                 }
+                let diffPeriod = ed - contractHolidayStartPer;
+                while (
+                  diffPeriod >
+                  1000 * 24 * 3600 * (365 + leap(contractHolidayStartPer))
+                ) {
+                  contractHolidayStartPer += 1000 * 24 * 3600 * 365;
+                  diffPeriod -= 1000 * 24 * 3600 * 365;
+                }
+
                 setTotHolidays(
                   calculateTotalHolidays(
                     contractHolidayStartPer,
@@ -404,8 +411,8 @@ export const AllowanceForm = (): JSX.Element => {
   );
 };
 const calculateTotalHolidays = (
-  startDate: Date,
-  endDate: Date,
+  startDate: number,
+  endDate: number,
   jurisdiction: string,
   bankHolsIncl: boolean,
   holidaysTaken: number
@@ -428,18 +435,11 @@ export const calculateAnnualCarryOver = (
 ): number => {
   return roundUpAll(Math.min(maxCarry, (1.6 / 5.6) * allowance), 1);
 };
-export const leap = (start: Date, end: Date): number => {
-  let mil = calculateDateDiffMil(start, end);
-  const oneYearMill = 1000 * 3600 * 24 * 365;
-  while (mil > oneYearMill) mil -= oneYearMill;
-
-  const startMil = end.getTime() - mil;
-  const startYear = new Date(startMil).getFullYear();
-  let endYear = new Date(end).getFullYear();
-
-  if (startYear == endYear) endYear++;
+export const leap = (start: number): number => {
+  const startYear = new Date(start).getFullYear();
 
   const startYearLeap = leapYear(startYear);
+  const endYear = new Date(start + 365 * 1000 * 24 * 3600).getFullYear();
   const endYearLeap = leapYear(endYear);
   let l: any = undefined;
   if (startYearLeap) {
@@ -448,53 +448,39 @@ export const leap = (start: Date, end: Date): number => {
     l = new Date(endYear, 1, 29).getTime();
   }
   if (l === undefined) return 0;
-  if (l > startMil && l < startMil + 3600 * 1000 * 24 * 366) return 1;
+
+  if (l > start && l < start + 3600 * 1000 * 24 * 366) return 1;
   return 0;
 };
 const leapYear = (year: number) => {
-  if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+  if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
     return true;
   }
 
   return false;
 };
-const calculateDaysBetweenDateYD = (start: Date, end: Date): number => {
-  let mil = calculateDateDiffMil(start, end);
-  const oneYearMill = 1000 * 3600 * 24 * (365 + leap(start, end));
-  while (mil + leap(start, end) * 3600 * 24 * 1000 > oneYearMill)
-    mil -= oneYearMill;
 
-  return mil / (3600 * 1000 * 24);
-};
-const calculateDateDiffMil = (start: Date, end: Date): number => {
+export const calculateDateDiffMil = (start: Date, end: Date): number => {
   let mil: number = end.getTime() - start.getTime();
 
-  return mil;
+  return mil + 3600 * 1000 * 24;
 };
 const calculateAccruedHolidays = (
-  startDate: Date,
-  endDate: Date,
+  start: number,
+  end: number,
   annualHolidayAllowance: number,
   holidayTaken: number,
   bankHolidaysIncluded: boolean,
   jurisdiction: string,
   carryOver: number
 ): number => {
-  const daysWorkedToDate =
-    calculateDaysBetweenDateYD(startDate, endDate) +
-    1 +
-    leap(startDate, endDate);
-  console.log("hello", daysWorkedToDate);
-  const nBankHolidays = calculateNumberOfBankHolidays(
-    startDate,
-    endDate,
-    jurisdiction
-  );
+  const daysWorkedToDate = (end - start) / (3600 * 1000 * 24) + 1;
+
+  const nBankHolidays = calculateNumberOfBankHolidays(start, end, jurisdiction);
 
   return (
     roundUpAll(
-      (daysWorkedToDate / (365 + leap(startDate, endDate))) *
-        annualHolidayAllowance +
+      (daysWorkedToDate / (365 + leap(start))) * annualHolidayAllowance +
         carryOver,
       1
     ) -
@@ -504,19 +490,12 @@ const calculateAccruedHolidays = (
 };
 
 const calculateNumberOfBankHolidays = (
-  startDate: Date,
-  endDate: Date,
+  start: number,
+  end: number,
   jurisdiction: string,
 
   mil?: number
 ): number => {
-  let diff = mil ? mil : calculateDateDiffMil(startDate, endDate);
-  const oneYearMill = 1000 * 3600 * 24 * (365 + leap(startDate, endDate));
-  while (diff + leap(startDate, endDate) * 3600 * 24 * 1000 > oneYearMill)
-    diff -= oneYearMill;
-  const periodStartDateMill = new Date(startDate.getDate() + diff).getTime();
-  const periodEndDateMill = endDate.getTime();
-
   let bankHolidaysMill: Array<number> = [];
   switch (jurisdiction) {
     case "England & Wales":
@@ -531,7 +510,7 @@ const calculateNumberOfBankHolidays = (
   }
 
   return bankHolidaysMill.reduce(
-    (a, b) => (b > periodStartDateMill && b < periodEndDateMill ? a + 1 : a),
+    (a, b) => (b > start && b < end ? a + 1 : a),
     0
   );
 };
@@ -551,21 +530,21 @@ const calculatePayout = (
 };
 
 export const roundUpAll = (original: number, precision: number) => {
-  var multiplier = Math.pow(10, precision || 0);
-  const value = parseFloat(original.toFixed(2));
-  const digits =
-    String(value).split(".").length > 0 ? String(value).split(".")[1] : [];
-  const numberOfDig = digits?.length ? digits.length : 0;
+  const value = original.toFixed(2);
+  const digits = value.split(".")[1];
+  let rounded: number | undefined = undefined;
 
-  const add =
-    numberOfDig === 0
-      ? 0
-      : Math.pow(10, -digits.length + 1) -
-        Math.pow(10, -numberOfDig) * parseInt(digits[digits.length - 1]);
-
-  let rounded = Math.round((value + add) * multiplier) / multiplier;
-
-  return rounded;
+  const sDigits = digits[1];
+  if (sDigits === "0") {
+    return original;
+  } else if (digits[0] === "9") {
+    return Math.round(parseFloat(value));
+  } else {
+    rounded = parseFloat(
+      value.split(".")[0] + "." + (parseInt(digits[0]) + 1).toString()
+    );
+    return rounded;
+  }
 };
 
 const currencyFormat = (num: number): string => {
