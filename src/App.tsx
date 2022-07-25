@@ -1,10 +1,10 @@
 import "./App.css";
 
-import { StatuatoryAllowanceCalc } from "./Forms/calculateAllowance";
+import { Sickpaycalculator } from "./Forms/calculator";
 function App() {
   return (
     <div className="App">
-      <StatuatoryAllowanceCalc />
+      <Sickpaycalculator />
     </div>
   );
 }
