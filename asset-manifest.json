@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Zelt-Statutory-Sick-Pay-Calculator/static/css/main.85db9c53.css",
+    "main.js": "/Zelt-Statutory-Sick-Pay-Calculator/static/js/main.1abbd47a.js",
+    "static/js/787.4c7ce82e.chunk.js": "/Zelt-Statutory-Sick-Pay-Calculator/static/js/787.4c7ce82e.chunk.js",
+    "index.html": "/Zelt-Statutory-Sick-Pay-Calculator/index.html",
+    "main.85db9c53.css.map": "/Zelt-Statutory-Sick-Pay-Calculator/static/css/main.85db9c53.css.map",
+    "main.1abbd47a.js.map": "/Zelt-Statutory-Sick-Pay-Calculator/static/js/main.1abbd47a.js.map",
+    "787.4c7ce82e.chunk.js.map": "/Zelt-Statutory-Sick-Pay-Calculator/static/js/787.4c7ce82e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.85db9c53.css",
+    "static/js/main.1abbd47a.js"
+  ]
+}
