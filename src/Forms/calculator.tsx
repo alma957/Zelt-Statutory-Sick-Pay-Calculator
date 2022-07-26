@@ -335,33 +335,19 @@ export const Sickpaycalculator = (): JSX.Element => {
           e.preventDefault();
         }}
       >
-        <label>
-          Does your employee have any of the following ?
-          <span
-            className="d-inline-block"
-            data-toggle="popover"
-            data-trigger="focus"
-            data-content="Please selecet account(s)"
-          >
-            <ReactSelect
-              options={statutes}
-              isMulti
-              closeMenuOnSelect={false}
-              onChange={e => {
-                state.statsSelected = e;
-                setState({...state});
-
-                let temp = "";
-                e.forEach(e => {
-                  if (e.right === false) {
-                    temp += e.value + ",";
-                  }
-                });
-                temp = temp.slice(0, -1);
-
-                setEntitlement(temp);
-                if (temp === "") setIsEntitle(true);
-                else setIsEntitle(false);
+        <div className="input-help">
+          <legend>Is your employee on Maternity leave? *</legend>
+        </div>
+        <label className="choice">
+          {" "}
+          <input
+            type="radio"
+            checked={!isEntitled}
+            onChange={e => {
+              if (e.target.checked) {
+                setIsEntitle(false);
+              } else {
+                setIsEntitle(true);
                 sumbt(
                   firstDaySick,
                   lastDaySick,
@@ -370,20 +356,44 @@ export const Sickpaycalculator = (): JSX.Element => {
                   state,
                   additionalPiw
                 );
-              }}
-              hideSelectedOptions={false}
-              components={{
-                Option,
-              }}
-            />
-          </span>
+              }
+            }}
+            required
+          />{" "}
+          Yes{" "}
         </label>
+        <label className="choice">
+          {" "}
+          <input
+            type="radio"
+            checked={isEntitled}
+            onChange={e => {
+              if (e.target.checked) {
+                //window.location.replace("");
+                setIsEntitle(true);
+                sumbt(
+                  firstDaySick,
+                  lastDaySick,
+                  firstDaySickPrev,
+                  lastDaySickPrev,
+                  state,
+                  additionalPiw
+                );
+              } else {
+                setIsEntitle(false);
+              }
+            }}
+            required
+          />{" "}
+          No
+        </label>
+
         <br></br>
         <h2 style={{display: !isEntitled ? "inline" : "none"}}>
-          She/He is not entitled to statutory sick pay because She/he receives{" "}
-          {entitlment}
+          She is not entitled to statutory sick pay because she is on maternity
+          leave
         </h2>
-
+        <br></br>
         <div style={{display: isEntitled ? "inline" : "none"}}>
           <legend>
             Does your Employee have an irregular work schedule ? *
@@ -595,6 +605,9 @@ export const Sickpaycalculator = (): JSX.Element => {
                     state,
                     e.target.checked ? false : true
                   );
+                  if (e.target.checked) {
+                    window.location.replace("");
+                  }
                 }}
                 required
               />{" "}
