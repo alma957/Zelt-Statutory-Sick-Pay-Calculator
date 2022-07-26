@@ -26,9 +26,9 @@ export const Results = (props: any): JSX.Element => {
         <div>
           <p>{`For the week ending ${el.week} you need to pay:`}</p>
         </div>
-        <div style={{ marginRight: "5px" }}>
+        <div style={{marginRight: "5px"}}>
           <p>
-            <b>{el.amount}</b>
+            <b>£{el.amount}</b>
           </p>
         </div>
       </div>
