@@ -330,6 +330,7 @@ export const Sickpaycalculator = (): JSX.Element => {
       <form
         className="myForm"
         id="form"
+        style={{marginLeft: "15px", marginRight: "15px"}}
         onSubmit={e => {
           e.preventDefault();
         }}
@@ -1106,37 +1107,20 @@ export const Sickpaycalculator = (): JSX.Element => {
                 </label>
               </div>
             </div>
-            <div className="flex-container" style={{marginTop: "15px"}}>
-              <div>
-                <button
-                  onClick={e => {
-                    console.log("clicked");
-                    sumbt(
-                      firstDaySick,
-                      lastDaySick,
-                      firstDaySickPrev,
-                      lastDaySickPrev,
-                      state,
-                      additionalPiw
-                    );
-                  }}
-                >
-                  Calculate
-                </button>
-              </div>
-              <div
-                className="flex-child"
-                id="output"
-                style={{
-                  background: "white",
-                }}
-              >
-                <Results
-                  results={results}
-                  enough={enoughSalary}
-                  style={{padding: "1px"}}
-                />
-              </div>
+            <br></br>
+            <div
+              className="flex-child"
+              id="output"
+              style={{
+                background: "white",
+                border: "solid black 3px",
+              }}
+            >
+              <Results
+                results={results}
+                enough={enoughSalary}
+                style={{padding: "1px"}}
+              />
             </div>
           </div>
         </div>
