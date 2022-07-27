@@ -75,16 +75,7 @@ export const Sickpaycalculator = (): JSX.Element => {
       const number2 = new Date(lastDaySickPrev).getTime();
       const number3 = new Date(firstDaySick).getTime();
       let ret = null;
-      console.log("Current period start ", number3);
-      console.log("Previous period end ", number2);
-      console.log(
-        "Difference ",
-        (number3 - number2) / (1000 * 3600 * 24 * 7 * 8)
-      );
-      console.log(
-        "Difference in weeks ",
-        (number3 - number2) / (1000 * 3600 * 24 * 7)
-      );
+
       if (number2 >= number3) {
         (state as any)["error"]["second_period_end"] =
           "The end of the previous period must be at least one day before the start of the current period";
@@ -185,10 +176,9 @@ export const Sickpaycalculator = (): JSX.Element => {
         additionalPiw
       )
     ) {
-      console.log("Input check not passed");
       return;
     }
-    console.log("Input check passed");
+
     const workingDays = state.workingDays.map((el: any) => el.value);
 
     const paymentLapse = state.eightWeeksOptions.value;
@@ -201,15 +191,13 @@ export const Sickpaycalculator = (): JSX.Element => {
       paymentLapse === "eight_weeks"
         ? new Date(state.paydates.second).getTime()
         : null;
-    console.log("just before");
+
     if (paymentLapse === "eight_weeks") {
-      console.log("in eigh weeks");
       if (
         state.periodEarnings /
           ((lastPayDate! - firstPayDate!) / (3600 * 1000 * 24 * 7)) <
         123
       ) {
-        console.log("Salary is insufficient for 8 weeks");
         setEnoughSalary(false);
         return;
       }
@@ -217,19 +205,13 @@ export const Sickpaycalculator = (): JSX.Element => {
       paymentLapse === "new_sick" ||
       paymentLapse === "less_eight_weeks"
     ) {
-      console.log("in new sick and less eight weeks");
       if ((state.periodEarnings / state.daysPeriod) * 7 < 123) {
         setEnoughSalary(false);
-        console.log(
-          "Returning salary too low for new sick and less eight weeks"
-        );
+
         return;
       }
     }
 
-    console.log("Period Earnings, ", state.periodEarnings / state.daysPeriod);
-
-    console.log("SALARY CHECK PASSED");
     setEnoughSalary(true);
 
     const fdSick = new Date(firstDaySick).getTime();
@@ -240,7 +222,7 @@ export const Sickpaycalculator = (): JSX.Element => {
     const fdSickPrev = firstDaySickPrev
       ? new Date(firstDaySickPrev).getTime()
       : null;
-    console.log("Additional PIWS ", additionalPiw);
+
     const wDays = additionalPiw
       ? findWeeks(fdSickPrev as number, ldSickPrev as number, workingDays)!.at(
           -1
@@ -255,7 +237,7 @@ export const Sickpaycalculator = (): JSX.Element => {
     )!;
 
     if (qualPayDaysLastPeriod === undefined) return;
-    console.log("QUalifying days ", qualPayDaysLastPeriod);
+
     const tempResults = new Array<Res>();
     for (let q of qualPayDaysLastPeriod) {
       const end = q.week;
@@ -1158,7 +1140,7 @@ export const calcAmount = (
   }
 
   tot =
-    relevantRates[results.qualifyingDays.length] * results.payableDays.length;
+    relevantRates[results.qualifyingDays.length][results.payableDays.length];
 
   return parseFloat(tot.toFixed(2));
 };

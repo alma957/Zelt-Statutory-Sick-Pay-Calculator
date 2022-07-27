@@ -144,8 +144,8 @@ export const inState = {
     value: "eight_weeks",
   },
   paydates: {
-    first: "2021-11-03",
-    second: "2021-12-31",
+    first: "2022-04-07",
+    second: "2022-06-04",
   },
   allowPaymentFrequency: false,
   workingDays: [
@@ -174,7 +174,7 @@ export const inState = {
   daysPeriod: 7,
   waitingDaysRemaining: null,
 };
-export const dailyRates = [
+export const dailyRates2 = [
   {
     start: 1649203200000,
     end: 1680652800000,
@@ -187,6 +187,66 @@ export const dailyRates = [
       2: 49.68,
       1: 99.35,
       0: 0,
+    },
+  },
+];
+export const dailyRates = [
+  {
+    start: 1649203200000,
+    end: 1680652800000,
+    rates: {
+      7: {
+        0: 0,
+        1: 14.2,
+        2: 28.39,
+        3: 42.58,
+        4: 56.78,
+        5: 70.97,
+        6: 85.16,
+        7: 99.35,
+      },
+      6: {
+        0: 0,
+        1: 16.56,
+        2: 33.12,
+        3: 49.68,
+        4: 66.24,
+        5: 82.8,
+        6: 99.35,
+      },
+      5: {
+        0: 0,
+        1: 19.87,
+        2: 39.47,
+        3: 59.61,
+        4: 79.48,
+        5: 99.35,
+      },
+      4: {
+        0: 0,
+        1: 24.84,
+        2: 49.68,
+        3: 74.52,
+        4: 99.35,
+      },
+      3: {
+        0: 0,
+        1: 33.12,
+        2: 66.24,
+        3: 99.35,
+      },
+      2: {
+        0: 0,
+        1: 49.68,
+        2: 99.35,
+      },
+      1: {
+        0: 0,
+        1: 99.35,
+      },
+      0: {
+        0: 0,
+      },
     },
   },
 ];
