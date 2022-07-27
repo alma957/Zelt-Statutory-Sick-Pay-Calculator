@@ -174,22 +174,22 @@ export const inState = {
   daysPeriod: 7,
   waitingDaysRemaining: null,
 };
-export const dailyRates2 = [
-  {
-    start: 1649203200000,
-    end: 1680652800000,
-    rates: {
-      7: 14.19,
-      6: 16.56,
-      5: 19.87,
-      4: 24.84,
-      3: 33.12,
-      2: 49.68,
-      1: 99.35,
-      0: 0,
-    },
-  },
-];
+// export const dailyRates2 = [
+//   {
+//     start: 1649203200000,
+//     end: 1680652800000,
+//     rates: {
+//       7: 14.19,
+//       6: 16.56,
+//       5: 19.87,
+//       4: 24.84,
+//       3: 33.12,
+//       2: 49.68,
+//       1: 99.35,
+//       0: 0,
+//     },
+//   },
+// ];
 export const dailyRates = [
   {
     start: 1649203200000,
