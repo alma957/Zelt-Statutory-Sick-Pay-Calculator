@@ -1003,7 +1003,8 @@ export const Sickpaycalculator = (): JSX.Element => {
               </div> */}
               <br></br>
               <legend>
-                Enter the total of earnings this period represents{" "}
+                Enter how much you would have paid if the employee had not been
+                sick{" "}
                 <input
                   type="number"
                   min="0"
