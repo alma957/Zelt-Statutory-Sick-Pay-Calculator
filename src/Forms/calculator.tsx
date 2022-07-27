@@ -860,7 +860,7 @@ export const Sickpaycalculator = (): JSX.Element => {
               <div>
                 <br></br>
                 <legend>
-                  Enter the amount paid over the period{" "}
+                Enter the total amount (before deductions) of your employee’s earnings on paydays{" "}
                   {state.paydates &&
                   state.paydates.first &&
                   state.paydates.second
