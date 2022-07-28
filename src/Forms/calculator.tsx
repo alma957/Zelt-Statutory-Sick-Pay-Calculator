@@ -1254,6 +1254,6 @@ const isDateValid = (date: string) => {
 };
 const isDifferenceValid = (start: string, end: string): boolean => {
   return (
-    new Date(end).getTime() - new Date(start).getTime() >= 4 * 3600 * 1000 * 24
+    new Date(end).getTime() - new Date(start).getTime() >= 3 * 3600 * 1000 * 24
   );
 };
